@@ -1,6 +1,5 @@
 # Shadow-Ink Loom (墨影织坊)
 
-> **“For the Shadow-bird to mend the world, it first needs to see in black and white.”**
 > **“鵼鸟织就黑白，为现实重构墨迹。”**
 
 **Shadow-Ink Loom** 是一款专为 **PCB 丝印设计**、**电子墨水屏（E-Ink）渲染** 及 **激光雕刻** 打造的高精度图像处理工具。
