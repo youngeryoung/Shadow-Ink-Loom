@@ -16,7 +16,7 @@ import img_processor  # 导入后端
 class PCBToolApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("图片二值化处理工具")
+        self.root.title("墨影织坊")
         self.root.minsize(850, 700) # 设置最小尺寸，防止UI崩坏
         
         # --- 状态变量 ---
