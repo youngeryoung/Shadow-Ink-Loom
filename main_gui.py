@@ -141,7 +141,7 @@ class PCBToolApp:
         self.var_dither = tk.BooleanVar(value=True)
         tk.Checkbutton(g3, text="抖动", variable=self.var_dither, command=self.update_preview).pack(side=tk.LEFT)
         tk.Label(g3, text="描边:").pack(side=tk.LEFT, padx=(5,0))
-        self.var_thickness = tk.IntVar(value=1)
+        self.var_thickness = tk.IntVar(value=0)
         tk.Spinbox(g3, from_=0, to=100, textvariable=self.var_thickness, width=3, command=self.update_preview).pack(side=tk.LEFT)
 
     def create_action_area(self):
@@ -279,25 +279,71 @@ class PCBToolApp:
             print(f"预览失败: {e}")
 
     def save_image(self):
-        if self.processed_image is None: return
+        # 1. 基础检查
+        if self.processed_image is None:
+            messagebox.showwarning("警告", "请先加载图片")
+            return
         
-        # 计算文件名精度
+        # 2. 保存前强制按照当前 UI 参数重新处理图像，不使用缓存
         try:
+            # 获取当前最新的参数
+            prec = self.var_precision.get()
+            mm_w = self.var_width_mm.get()
+            mm_h = self.var_height_mm.get()
+            
+            px_w = int(round(mm_w / prec))
+            px_h = int(round(mm_h / prec))
+            
+            # 执行算法（确保这是最新的结果）
+            self.processed_image = img_processor.process_image(
+                self.src_image, px_w, px_h, 
+                use_dithering=self.var_dither.get(),
+                line_thickness=self.var_thickness.get()
+            )
+            
+            # 同步刷新预览区域，让用户知道保存的是哪张图
+            self.display_image(self.processed_image, self.panel_right)
+            self.update_pixel_info()
+            
+        except Exception as e:
+            messagebox.showerror("生成失败", f"处理图像时发生错误: {e}")
+            return
+
+        # 3. 处理文件名
+        try:
+            # 动态检测精度字符串中的小数位数
             prec_str = self.entry_precision.get().strip()
             decimals = len(prec_str.split(".")[1]) if "." in prec_str else 0
-        except: decimals = 2
+        except:
+            decimals = 2
 
         out_dir = self.entry_output.get()
-        if not os.path.exists(out_dir): os.makedirs(out_dir)
+        if not os.path.exists(out_dir):
+            try:
+                os.makedirs(out_dir)
+            except Exception as e:
+                messagebox.showerror("错误", f"无法创建目录: {e}")
+                return
 
-        name = os.path.splitext(os.path.basename(self.img_path))[0]
-        w_s = f"{self.var_width_mm.get():.{decimals}f}"
-        h_s = f"{self.var_height_mm.get():.{decimals}f}"
+        # 获取不带后缀的文件名
+        base_name = os.path.splitext(os.path.basename(self.img_path))[0]
+        
+        # 格式化物理尺寸字符串
+        w_str = f"{mm_w:.{decimals}f}"
+        h_str = f"{mm_h:.{decimals}f}"
+        
         mode = "dither" if self.var_dither.get() else "flat"
         
-        out_path = os.path.join(out_dir, f"{name}_{w_s}x{h_s}mm_{mode}.png")
-        cv2.imwrite(out_path, self.processed_image)
-        messagebox.showinfo("保存成功", f"文件已存至:\n{out_path}")
+        # 构造最终文件名: name_20.00x30.00mm_dither.png
+        out_filename = f"{base_name}_{w_str}x{h_str}mm_{mode}.png"
+        out_path = os.path.join(out_dir, out_filename)
+        
+        # 4. 写入文件
+        try:
+            cv2.imwrite(out_path, self.processed_image)
+            messagebox.showinfo("保存成功", f"文件已生成并保存至:\n{out_path}")
+        except Exception as e:
+            messagebox.showerror("写入失败", f"无法写入文件: {e}")
 
 if __name__ == "__main__":
     root = tk.Tk()
