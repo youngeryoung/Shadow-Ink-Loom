@@ -91,23 +91,24 @@ def process_image(img_array, target_width_px, target_height_px, use_dithering=Tr
             cv2.THRESH_BINARY, block_size, 2
         )
 
-    # 4. 轮廓重绘 (在原图尺寸提取，映射到新尺寸)
-    blurred = cv2.GaussianBlur(gray_src, (5, 5), 0)
-    median_val = np.median(blurred)
-    sigma = 0.33
-    canny_low = int(max(0, (1.0 - sigma) * median_val))
-    canny_high = int(min(255, (1.0 + sigma) * median_val))
-    
-    edges = cv2.Canny(blurred, canny_low, canny_high)
-    contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # 4. 轮廓重绘 (仅当 thickness > 0 时执行)
+    if line_thickness > 0:
+        blurred = cv2.GaussianBlur(gray_src, (5, 5), 0)
+        median_val = np.median(blurred)
+        sigma = 0.33
+        canny_low = int(max(0, (1.0 - sigma) * median_val))
+        canny_high = int(min(255, (1.0 + sigma) * median_val))
+        
+        edges = cv2.Canny(blurred, canny_low, canny_high)
+        contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    if contours:
-        for c in contours:
-            c_transformed = c.astype(np.float32)
-            c_transformed[:, 0, 0] *= scale_x
-            c_transformed[:, 0, 1] *= scale_y
-            c_final = c_transformed.astype(np.int32)
-            # 画黑线 (0)
-            cv2.drawContours(canvas, [c_final], -1, 0, thickness=line_thickness)
+        if contours:
+            for c in contours:
+                c_transformed = c.astype(np.float32)
+                c_transformed[:, 0, 0] *= scale_x
+                c_transformed[:, 0, 1] *= scale_y
+                c_final = c_transformed.astype(np.int32)
+                # 画黑线 (0)
+                cv2.drawContours(canvas, [c_final], -1, 0, thickness=line_thickness)
 
     return canvas
