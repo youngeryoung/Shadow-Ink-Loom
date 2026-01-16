@@ -142,7 +142,7 @@ class PCBToolApp:
         tk.Checkbutton(g3, text="抖动", variable=self.var_dither, command=self.update_preview).pack(side=tk.LEFT)
         tk.Label(g3, text="描边:").pack(side=tk.LEFT, padx=(5,0))
         self.var_thickness = tk.IntVar(value=1)
-        tk.Spinbox(g3, from_=1, to=10, textvariable=self.var_thickness, width=3, command=self.update_preview).pack(side=tk.LEFT)
+        tk.Spinbox(g3, from_=0, to=100, textvariable=self.var_thickness, width=3, command=self.update_preview).pack(side=tk.LEFT)
 
     def create_action_area(self):
         action_frame = tk.Frame(self.main_container)
