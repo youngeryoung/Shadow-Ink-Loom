@@ -16,7 +16,7 @@ import img_processor  # 导入后端
 class PCBToolApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("PCB 丝印图片处理工具")
+        self.root.title("图片二值化处理工具")
         self.root.minsize(850, 700) # 设置最小尺寸，防止UI崩坏
         
         # --- 状态变量 ---
@@ -68,13 +68,13 @@ class PCBToolApp:
         self.preview_frame.rowconfigure(0, weight=1)
 
         # 左侧原图容器
-        self.box_left = tk.LabelFrame(self.preview_frame, text=" [ 1 ] 原始图片 (原比例) ", bg="#f0f0f0")
+        self.box_left = tk.LabelFrame(self.preview_frame, text="原始图片 (原比例) ", bg="#f0f0f0")
         self.box_left.grid(row=0, column=0, sticky="nsew", padx=2)
         self.panel_left = tk.Label(self.box_left, bg="#f0f0f0")
         self.panel_left.pack(fill=tk.BOTH, expand=True)
 
         # 右侧预览图容器
-        self.box_right = tk.LabelFrame(self.preview_frame, text=" [ 2 ] 丝印生成预览 (二值化) ", bg="#f0f0f0")
+        self.box_right = tk.LabelFrame(self.preview_frame, text="生成预览 (二值化) ", bg="#f0f0f0")
         self.box_right.grid(row=0, column=1, sticky="nsew", padx=2)
         self.panel_right = tk.Label(self.box_right, bg="#f0f0f0")
         self.panel_right.pack(fill=tk.BOTH, expand=True)
@@ -106,7 +106,7 @@ class PCBToolApp:
         settings_frame.pack(fill=tk.X, pady=5)
 
         # 组1：丝印精度
-        g1 = tk.LabelFrame(settings_frame, text=" 丝印工艺 ", padx=5, pady=5)
+        g1 = tk.LabelFrame(settings_frame, text=" 工艺细节 ", padx=5, pady=5)
         g1.pack(side=tk.LEFT, fill=tk.Y, padx=5)
         
         tk.Label(g1, text="精度 (mm/px):").pack(side=tk.LEFT)
